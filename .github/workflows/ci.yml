@@ -34,7 +34,7 @@ jobs:
         run: pytest tests/test_basic.py
 
       - name: Upload pytest marker
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: deterministic-test-marker
           path: pyproject.toml
@@ -66,7 +66,7 @@ jobs:
         run: pytest tests/test_flaky.py
 
       - name: Upload flaky marker
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: flaky-test-marker
           path: pyproject.toml
