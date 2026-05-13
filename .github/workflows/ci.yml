@@ -1,0 +1,72 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Cache pip
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: pip-${{ runner.os }}-${{ hashFiles('pyproject.toml') }}
+          restore-keys: |
+            pip-${{ runner.os }}-
+
+      - name: Install
+        run: python -m pip install -e ".[dev]"
+
+      - name: Run deterministic tests
+        run: pytest tests/test_basic.py
+
+      - name: Upload pytest marker
+        uses: actions/upload-artifact@v4.0.0
+        with:
+          name: deterministic-test-marker
+          path: pyproject.toml
+
+  flaky:
+    name: flaky
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Cache pip
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: pip-${{ runner.os }}-${{ hashFiles('pyproject.toml') }}
+          restore-keys: |
+            pip-${{ runner.os }}-
+
+      - name: Install
+        run: python -m pip install -e ".[dev]"
+
+      - name: Run flaky tests
+        run: pytest tests/test_flaky.py
+
+      - name: Upload flaky marker
+        uses: actions/upload-artifact@v4.0.0
+        with:
+          name: flaky-test-marker
+          path: pyproject.toml
